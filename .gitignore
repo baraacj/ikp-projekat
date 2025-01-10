@@ -1,0 +1,4 @@
+# Visual Studio privremeni fajlovi
+.vs/
+*.ipch
+*.db
