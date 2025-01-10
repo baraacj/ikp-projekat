@@ -1,20 +1,96 @@
-// PubSubEngine.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 
-#include <iostream>
+#include <conio.h>
+#include "../Common/PubSubEngine.h"
 
-int main()
+
+int  main(void)
 {
-    std::cout << "Hello World!\n";
+	// Socket used for listening for new clients 
+	SOCKET listenSocketPublisher = INVALID_SOCKET;
+	int iResult;
+
+
+
+	if (InitializeWindowsSockets() == false)
+	{
+		// we won't log anything since it will be logged
+		// by InitializeWindowsSockets() function
+		return 1;
+	}
+
+	listenSocketPublisher = InitializeListenSocket(PUBLISHER_PORT);
+	if (listenSocketPublisher == SOCKET_ERROR || listenSocketPublisher == INVALID_SOCKET) return 1;
+	
+	// Set listenSocket in listening mode
+	iResult = listen(listenSocketPublisher, SOMAXCONN);
+
+	if (iResult == SOCKET_ERROR)
+	{
+		printf("listen failed with error: %d\n", WSAGetLastError());
+		closesocket(listenSocketPublisher);
+		WSACleanup();
+		return 1;
+	}
+
+	printf("Server initialized, waiting for clients.\n");
+
+	InitializeQUEUE(&queue);
+	InitAllNecessaryCriticalSection();
+
+	CreateAllSemaphores();
+
+	CreateAllThreads(&listenSocketPublisher);
+
+	if (!t1 || !t3) {
+
+		ReleaseSemaphore(FinishSignal, 6, NULL);
+	}
+
+	while (1) {
+
+		if (_kbhit()) {
+			char c = _getch();
+			if (c == 'q') {
+				ReleaseSemaphore(FinishSignal, 6, NULL);
+				break;
+			}
+		}
+	}
+
+	if (t1) {
+		WaitForSingleObject(t1, INFINITE);
+	}
+	
+	if (t3) {
+		WaitForSingleObject(t3, INFINITE);
+	}
+	
+
+
+	DeleteAllThreadsAndSemaphores();
+	DeleteAllNecessaryCriticalSection();
+
+
+	// clear queue
+	//oslobodi memoriju koju je zauzeo queueu ukoliko ima nesto na njemu
+	ClearQueue(&queue);
+
+	ZatvoriSveSocketeZaListu(publisherSockets);
+
+	//printf("TABELA BRE BRISANJA\n");
+	//printTable(tabela);
+	//printf("TABELA POSLE BRISANJA\n");
+	//printTable(tabela);
+	//printf("END BRISANJE TABELE\n");
+
+	deleteList(&publisherSockets); // oslobodi memoriju koju je zauzela lista
+
+
+
+	// cleanup
+	closesocket(listenSocketPublisher);
+	listenSocketPublisher = INVALID_SOCKET;
+	WSACleanup();
+
+	return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

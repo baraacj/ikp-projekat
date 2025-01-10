@@ -2,19 +2,62 @@
 //
 
 #include <iostream>
+#include "../Common/Publisher.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	// variable used to store function return value
+	int iResult;
+
+
+	if (InitializeWindowsSockets() == false)
+	{
+		// we won't log anything since it will be logged
+		// by InitializeWindowsSockets() function
+		return 1;
+	}
+
+	if (Connect())
+		return 1;
+
+	char topic[21];
+	char message[491];
+	int location;
+
+
+
+	do {
+		printf("Unesite TOPIC za vest: ");
+		gets_s(topic, MAX_TOPIC);
+		strcpy_s(topic, TopicToLower(topic));  // Pretvori u mala slova
+
+		printf("Unesite lokaciju (broj): ");
+		scanf_s("%d", &location);  // Unos lokacije kao celog broja
+		getchar();  // Ukloni novi red posle unosa broja
+
+		printf("Unesite sada poruku: ");
+		gets_s(message, sizeof(message));
+
+		// Provera za kraj unosa
+		if (strcmp("kraj", topic) == 0 || strcmp("kraj", message) == 0 ||
+			strcmp("exit", topic) == 0 || strcmp("exit", message) == 0) {
+			break; // Izlaz iz petlje
+		}
+
+		// Poziv funkcije Publish sa dodatim parametrom za lokaciju
+		iResult = Publish((void*)topic, location, (void*)message);
+
+		// Provera greške pri slanju
+		if (iResult == -1) {
+			printf("Greska prilikom slanja poruke.\n");
+			break;
+		}
+
+		printf("Bytes Sent: %ld\n", iResult);
+
+	} while (true);
+
+
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

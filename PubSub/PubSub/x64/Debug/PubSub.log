@@ -1,0 +1,6 @@
+﻿  PubSubEngine.cpp
+C:\Users\38161\Desktop\iva\IKP\PubSub\Common\List.h(94,10): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'SOCKET'
+C:\Users\38161\Desktop\iva\IKP\PubSub\Common\List.h(94,10): message : consider using '%lld' in the format string
+C:\Users\38161\Desktop\iva\IKP\PubSub\Common\List.h(94,10): message : consider using '%Id' in the format string
+C:\Users\38161\Desktop\iva\IKP\PubSub\Common\List.h(94,10): message : consider using '%I64d' in the format string
+  PubSub.vcxproj -> C:\Users\38161\Desktop\iva\IKP\PubSub\x64\Debug\PubSub Engine.exe
